@@ -6,12 +6,26 @@ import chalk from "chalk";
 export default class TCCLI {
     constructor() {
         this.prompt = inquirer.createPromptModule();
-
+        this.childProcesses = [];
     }
 
     setRunning(running) {
         this.running = running;
     }
+
+    addProcess(process) {
+        this.childProcesses.push(process);
+    }
+
+    removeProcess(process) {
+        this.childProcesses = this.childProcesses.filter(p => p !== process);
+    }
+
+    getProcesses() {
+        return this.childProcesses;
+    }
+
+
 
     showStartPrompt() {
         console.log(chalk.blue("Welcome to TCCLI, the Telecommunications Command Line Interface!"));
@@ -38,7 +52,6 @@ export default class TCCLI {
         if (command in Commands) {
             return Commands[command](this, asyncB, args);
         } else {
-            chalk("Command not found", "red");
             return chalk.red("Command not found");
         }
     }
@@ -60,16 +73,16 @@ export default class TCCLI {
             message: chalk.green('¤¤ ' + process.cwd() + '>')
         }).then((answers) => {
             return this.handleInput(answers['command']);
+        }).catch((e) => {
+            console.log(e);
+            if (this.running) {
+                setImmediate(() => this.run(true));
+            }
         }).then((output) => {
             if (output) {
                 console.log(output);
             }
         }).finally(() => {
-            if (this.running) {
-                setImmediate(() => this.run(true));
-            }
-        }).catch((e) => {
-            console.log(e);
             if (this.running) {
                 setImmediate(() => this.run(true));
             }

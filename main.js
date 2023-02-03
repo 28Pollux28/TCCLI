@@ -9,6 +9,15 @@ process.stdin.on('keypress', function(ch, key){
     }
 });
 
+process.on('SIGINT', function() {
+    if(cli.running) {
+        if(!cli.inChildProcess){
+            console.log("\nCaptured SIGINT, stopping...");
+            cli.kill();
+        }
+    }
+});
+
 let cli;
 
 function main(){

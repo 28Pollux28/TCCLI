@@ -7,6 +7,7 @@ export default class TCCLI {
     constructor() {
         this.prompt = inquirer.createPromptModule();
         this.childProcesses = [];
+        this.inChildProcess = false;
     }
 
     setRunning(running) {
@@ -63,6 +64,10 @@ export default class TCCLI {
 
     kill() {
         process.exit();
+    }
+
+    setInChildProcess(inChildProcess) {
+        this.inChildProcess = inChildProcess;
     }
 
     run(running) {

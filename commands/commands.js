@@ -74,8 +74,9 @@ function start(TCCLI, asyncB, args) {
     }
     const resolved = which.sync(args[0], {nothrow: true});
     try {
+        TCCLI.setInChildProcess(true);
         const child = spawnSync(resolved || args[0], args.slice(1), {
-            cwd: process.cwd(), stdio: [process.stdin, process.stdout, process.stderr]
+            cwd: process.cwd(), stdio: [process.stdin, process.stdout, process.stderr], killSignal: 'SIGINT'
         });
         if (child.error) {
             if (child.error.code === "ENOENT") {
@@ -86,14 +87,17 @@ function start(TCCLI, asyncB, args) {
                         stdio: []
                     }), "cp850"));
                 } catch (e) {
+                    TCCLI.setInChildProcess(false);
                     return formats.error("Error happened: " + iconv.decode(e.stderr, "cp850"));
                 }
             } else {
+                TCCLI.setInChildProcess(false);
                 return formats.error("" + child.error);
             }
         }
     } catch (e) {
         console.log(e);
+        TCCLI.setInChildProcess(false);
         return formats.error("" + e);
     }
 }
